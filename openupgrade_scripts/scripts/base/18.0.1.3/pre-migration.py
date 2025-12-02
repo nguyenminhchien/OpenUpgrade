@@ -61,6 +61,17 @@ def _fix_company_layout_background(cr):
         "WHERE layout_background='Geometric'",
     )
 
+# trobz migrate
+def _fix_barcode_json_value_compatibility(cr):
+    """ """
+    openupgrade.logged_query(
+        cr,
+        r"""UPDATE res_partner
+            SET barcode = '"' || barcode || '"'
+            WHERE barcode IS NOT NULL
+            AND (barcode !~ '^\s*[{[].*[]}]$');""",
+    )
+
 
 @openupgrade.migrate(use_env=False)
 def migrate(cr, version):
@@ -91,3 +102,4 @@ def migrate(cr, version):
     _fix_list_view_mode(cr)
     _fix_serbian_res_lang_record(cr)
     _fix_company_layout_background(cr)
+    _fix_barcode_json_value_compatibility(cr)
