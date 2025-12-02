@@ -5,6 +5,8 @@ from openupgradelib import openupgrade
 
 
 def _assign_pos_order_token(env):
+    # trobz migrate: enable gen_random_uuid function for later use
+    openupgrade.logged_query(env.cr, "CREATE EXTENSION pgcrypto;")
     openupgrade.add_fields(
         env,
         [("access_token", "pos.order", "pos_order", "char", False, "point_of_sale")],
