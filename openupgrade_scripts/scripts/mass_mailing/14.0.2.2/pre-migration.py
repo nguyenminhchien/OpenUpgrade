@@ -42,15 +42,18 @@ def _assign_newsletter_xml_id(env):
     env.cr.execute("SELECT id FROM mailing_list WHERE name='Newsletter'")
     row = env.cr.fetchone()
     if row:
-        openupgrade.logged_query(
-            env.cr,
-            """INSERT INTO ir_model_data
-            (module, name, res_id, model, noupdate)
-            VALUES
-            ('mass_mailing', 'mailing_list_data', %s, 'mailing.list', True)
-            """,
-            (row[0],),
-        )
+        # trobz migrate
+        env.cr.execute("SELECT id FROM ir_model_data WHERE module='mass_mailing' and name='mailing_list_data' and model='mailing.list' and res_id=%s" % row[0])
+        if not env.cr.fetchone():
+            openupgrade.logged_query(
+                env.cr,
+                """INSERT INTO ir_model_data
+                (module, name, res_id, model, noupdate)
+                VALUES
+                ('mass_mailing', 'mailing_list_data', %s, 'mailing.list', True)
+                """,
+                (row[0],),
+            )
 
 
 @openupgrade.migrate()

@@ -343,7 +343,8 @@ def post_statements(env):
     # instead, call it one by one.
     stmts = env["account.bank.statement"].browse(stmt_ids)
     for stmt in stmts:
-        stmt.button_post()
+        # trobz migrate: skip_check_constrains_account_id_journal_id
+        stmt.with_context(skip_check_constrains_account_id_journal_id=True).button_post()
 
 
 def pass_bank_statement_line_note_to_journal_entry_narration(env):
@@ -710,7 +711,8 @@ def fill_account_payment_with_no_move(env):
         )
         deprecated_accounts.deprecated = False
         try:
-            payment._synchronize_to_moves(
+            # trobz migrate: add context skip_check_constrains_account_id_journal_id to skip constraint
+            payment.with_context(skip_check_constrains_account_id_journal_id=True)._synchronize_to_moves(
                 [
                     "date",
                     "amount",
@@ -930,12 +932,16 @@ def migrate(env, version):
     try_delete_noupdate_records(env)
     _create_hooks(env)
     fill_company_account_journal_suspense_account_id(env)
+
     fill_statement_lines_with_no_move(env)
+    
     fill_account_journal_payment_credit_debit_account_id(env)
     create_new_counterpart_account_payment_transfer(env)
     map_account_payment_transfer(env)
     fill_account_payment_reconciliation(env)
+
     fill_account_payment_with_no_move(env)
+    
     fill_account_bank_statement_line_reconciliation(env)
     post_statements(env)
     _delete_hooks(env)

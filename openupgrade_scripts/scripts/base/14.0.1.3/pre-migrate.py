@@ -145,6 +145,11 @@ def migrate(cr, version):
     if cr.fetchall():
         merged_modules["edi"] = renamed_modules.pop("edi")
 
+    # Trobz, duplicate edi_storage_oca key when renaming
+    cr.execute("SELECT 1 FROM ir_module_module WHERE name='edi_storage_oca'")
+    if cr.fetchall():
+        merged_modules["edi_storage"] = renamed_modules.pop("edi_storage")
+        
     openupgrade.update_module_names(cr, renamed_modules.items())
     openupgrade.update_module_names(cr, merged_modules.items(), merge_modules=True)
     openupgrade.clean_transient_models(cr)

@@ -71,9 +71,11 @@ def migrate(env, version):
         """CREATE TABLE project_allowed_portal_users_rel
         (project_project_id INTEGER, res_users_id INTEGER)""",
     )
-    openupgrade.logged_query(
-        env.cr,
-        """CREATE TABLE project_task_res_users_rel
-        (project_task_id INTEGER, res_users_id INTEGER)""",
-    )
+    # trobz migrate: only create if project_task_res_users_rel not exist
+    if not openupgrade.table_exists(env.cr, 'project_task_res_users_rel'):
+        openupgrade.logged_query(
+            env.cr,
+            """CREATE TABLE project_task_res_users_rel
+            (project_task_id INTEGER, res_users_id INTEGER)""",
+        )
     fast_fill_stored_calculated_fields(env)
