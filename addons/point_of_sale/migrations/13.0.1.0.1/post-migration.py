@@ -7,7 +7,8 @@ _unlink_by_xmlid = [
     # account.journal
     'point_of_sale.pos_sale_journal',
     # ir.sequence
-    'point_of_sale.seq_picking_type_posout',
+    # trobz migrate: for foodcoop, we want to keep this sequence
+    # 'point_of_sale.seq_picking_type_posout',
 ]
 
 

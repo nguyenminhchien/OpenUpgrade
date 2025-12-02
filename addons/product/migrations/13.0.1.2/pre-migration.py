@@ -254,6 +254,14 @@ def fill_product_template_attribute_value__attribute_id_related(env):
         WHERE ptav.attribute_line_id = ptal.id""",
     )
 
+def add_xmlid_for_master_data(env):
+        # <record forcecreate="True" id="decimal_volume" model="decimal.precision">
+        # <field name="name">Volume</field>
+        # <field name="digits">2</field>
+        # </record>
+    decimal_rec = env['decimal.precision'].search([("name", "=", "Volume")], limit=1)
+    if decimal_rec:
+        openupgrade.add_xmlid(env.cr, "product", "decimal_volume", "decimal.precision", decimal_rec.id, noupdate=True)
 
 @openupgrade.migrate()
 def migrate(env, version):
@@ -271,3 +279,4 @@ def migrate(env, version):
     fill_product_template_attribute_value__attribute_id_related(env)
     calculate_product_product_combination_indices(env)
     create_and_fill_product_variant_combination(env)
+    add_xmlid_for_master_data(env)
