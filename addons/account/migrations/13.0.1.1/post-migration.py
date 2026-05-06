@@ -1019,12 +1019,25 @@ def _recompute_move_entries_totals(env):
 
 
 def fill_account_move_line_missing_fields(env):
-    openupgrade.logged_query(env.cr, """
-        UPDATE account_move_line aml
-        SET account_root_id = aa.root_id
-        FROM account_account aa
-        WHERE aa.id = aml.account_id
-    """)
+    """
+    Changes:
+    1) account_root_id: No update as it was removed from 18.0.
+    2) tax_group_id: No update as it was computed by module
+      foodcoop_mig18_precompute_fields (12.0). Its value is stored by
+      mig18_tax_group_id.
+      So, here, skip if at least 1 record was set tax_group_id.
+    """
+
+    # openupgrade.logged_query(env.cr, """
+    #     UPDATE account_move_line aml
+    #     SET account_root_id = aa.root_id
+    #     FROM account_account aa
+    #     WHERE aa.id = aml.account_id
+    # """)
+    if env['account.move.line'].search([('tax_group_id', '!=', False)], limit=1):
+        # If at least one tax_group_id is set, we consider that the field was 
+        # already filled by module foodcoop_mig18_precompute_fields in 12.0.
+        return
     openupgrade.logged_query(env.cr, """
         UPDATE account_move_line aml
         SET tax_group_id = at.tax_group_id

@@ -157,12 +157,36 @@ def create_account_move_new_columns(env):
 
 def fill_account_move_line(env):
     """Faster way"""
+    """
+    Changes:
+    1) parent_state: straightforward rename from mig18_parent_state.
+    2) account_internal_type: skip its value as it was removed from 18.0.
+    """
+
+    # Check if mig18_parent_state exists and rename it, otherwise create parent_state
+    skip_parent_state = False
+    if openupgrade.column_exists(env.cr, "account_move_line", "mig18_parent_state"):
+        openupgrade.rename_columns(env.cr, {
+            'account_move_line': [
+                ('mig18_parent_state', 'parent_state'),
+            ],
+        })
+        skip_parent_state = True
+    else:
+        openupgrade.logged_query(
+            env.cr, """
+            ALTER TABLE account_move_line
+            ADD COLUMN parent_state varchar""",
+        )
+    
     openupgrade.logged_query(
         env.cr, """
         ALTER TABLE account_move_line
-        ADD COLUMN parent_state varchar,
         ADD COLUMN account_internal_type varchar""",
     )
+
+    if skip_parent_state:
+        return
     openupgrade.logged_query(
         env.cr, """
         UPDATE account_move_line aml
@@ -319,6 +343,18 @@ def migrate(env, version):
     cr = env.cr
     openupgrade.copy_columns(cr, _column_copies)
     openupgrade.rename_columns(cr, _column_renames)
+
+    if openupgrade.column_exists(
+            cr, "account_move_line", "mig18_tax_group_id"):
+        # The column mig18_tax_group_id was added and filled by module
+        # foodcoop_mig18_precompute_fields in 12.0.
+        _column_renames_if_exists = {
+            'account_move_line': [
+                ('mig18_tax_group_id', 'tax_group_id'),
+            ],
+        }
+        openupgrade.rename_columns(cr, _column_renames_if_exists)
+
     openupgrade.rename_fields(env, _field_renames)
     if openupgrade.table_exists(cr, 'sale_order'):
         openupgrade.rename_fields(env, _field_sale_renames)

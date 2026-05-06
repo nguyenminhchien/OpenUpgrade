@@ -526,7 +526,8 @@ def migrate(env, version):
     product_template_responsible_id_to_company_dependent(env)
     fill_company_id(env.cr)
     fill_stock_putaway_rule_location_in_id(env)
-    fill_propagate_date_minimum_delta(env)
+    # skip fill_propagate_date_minimum_delta as it was removed from 14.0
+    # fill_propagate_date_minimum_delta(env)
     fill_stock_inventory_start_empty(env)
     map_stock_location_usage(env)
     map_stock_picking_responsible_responsible_id_to_user_id(env)
