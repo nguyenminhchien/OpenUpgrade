@@ -4,13 +4,26 @@ from openupgradelib import openupgrade
 
 
 def fill_purchase_order_line_qty_to_invoice(env):
-    if not openupgrade.column_exists(env.cr, "purchase_order_line", "qty_to_invoice"):
+    has_mig18_qty_to_invoice = openupgrade.column_exists(
+        env.cr, "purchase_order_line", "mig18_qty_to_invoice"
+    )
+    if has_mig18_qty_to_invoice:
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE purchase_order_line
+            RENAME COLUMN mig18_qty_to_invoice TO qty_to_invoice
+            """,
+        )
+    elif not openupgrade.column_exists(env.cr, "purchase_order_line", "qty_to_invoice"):
         openupgrade.logged_query(
             env.cr,
             """
             ALTER TABLE purchase_order_line
             ADD COLUMN qty_to_invoice numeric""",
         )
+    if has_mig18_qty_to_invoice:
+        return
     openupgrade.logged_query(
         env.cr,
         """
@@ -23,7 +36,8 @@ def fill_purchase_order_line_qty_to_invoice(env):
             ELSE 0 END
         FROM purchase_order po, product_product pp
         JOIN product_template pt ON pp.product_tmpl_id = pt.id
-        WHERE pol.order_id = po.id AND pol.product_id = pp.id""",
+        WHERE pol.order_id = po.id AND pol.product_id = pp.id
+        """,
     )
 
 

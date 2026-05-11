@@ -582,6 +582,17 @@ def map_account_payment_transfer(env):
 
 
 def fill_account_payment_reconciliation(env):
+    env.cr.execute(
+        """
+        SELECT 1
+        FROM account_payment
+        WHERE is_matched IS NOT NULL OR is_reconciled IS NOT NULL
+        LIMIT 1
+        """
+    )
+    has_prefilled_reconciliation = bool(env.cr.fetchone())
+    if has_prefilled_reconciliation:
+        return
     openupgrade.logged_query(
         env.cr,
         """
@@ -747,6 +758,29 @@ def try_delete_noupdate_records(env):
 
 
 def fill_account_move_line_amounts(env):
+    legacy_amount_currency = openupgrade.get_legacy_name("amount_currency")
+    if openupgrade.column_exists(env.cr, "account_move_line", "mig18_amount_currency"):
+        if openupgrade.column_exists(env.cr, "account_move_line", "amount_currency") and not openupgrade.column_exists(
+            env.cr, "account_move_line", legacy_amount_currency
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN amount_currency TO {}
+                """.format(legacy_amount_currency),
+            )
+        if openupgrade.column_exists(env.cr, "account_move_line", "mig18_amount_currency") and not openupgrade.column_exists(
+            env.cr, "account_move_line", "amount_currency"
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN mig18_amount_currency TO amount_currency
+                """,
+            )
+        return
     openupgrade.logged_query(
         env.cr,
         """

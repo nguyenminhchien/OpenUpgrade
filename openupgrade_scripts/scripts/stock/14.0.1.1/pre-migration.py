@@ -53,7 +53,7 @@ def fast_precreate_orderpoint_product_category_id(env):
 
 @openupgrade.migrate()
 def migrate(env, version):
-    openupgrade.copy_columns(env.cr, _column_copies)
+    # openupgrade.copy_columns(env.cr, _column_copies)
     openupgrade.rename_fields(env, _field_renames)
     openupgrade.rename_xmlids(env.cr, _xmlid_renames)
     openupgrade.add_fields(env, _field_additons)

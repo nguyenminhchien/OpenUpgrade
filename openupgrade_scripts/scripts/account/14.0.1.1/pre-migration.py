@@ -297,6 +297,10 @@ def fill_empty_partner_type_account_payment(env):
 
 
 def fill_account_move_line_currency_id(env):
+    legacy_currency_id = openupgrade.get_legacy_name("currency_id")
+    legacy_amount_residual_currency = openupgrade.get_legacy_name(
+        "amount_residual_currency"
+    )
     # Disappeared constraint
     openupgrade.logged_query(
         env.cr,
@@ -308,6 +312,48 @@ def fill_account_move_line_currency_id(env):
     openupgrade.delete_records_safely_by_xml_id(
         env, ["account.constraint_account_move_line_check_amount_currency_balance_sign"]
     )
+    if openupgrade.column_exists(env.cr, "account_move_line", "mig18_currency_id"):
+        if openupgrade.column_exists(env.cr, "account_move_line", "currency_id") and not openupgrade.column_exists(
+            env.cr, "account_move_line", legacy_currency_id
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN currency_id TO {}
+                """.format(legacy_currency_id),
+            )
+        if openupgrade.column_exists(env.cr, "account_move_line", "amount_residual_currency") and not openupgrade.column_exists(
+            env.cr, "account_move_line", legacy_amount_residual_currency
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN amount_residual_currency TO {}
+                """.format(legacy_amount_residual_currency),
+            )
+        if openupgrade.column_exists(env.cr, "account_move_line", "mig18_amount_residual_currency") and not openupgrade.column_exists(
+            env.cr, "account_move_line", "amount_residual_currency"
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN mig18_amount_residual_currency TO amount_residual_currency
+                """,
+            )
+        if openupgrade.column_exists(env.cr, "account_move_line", "mig18_currency_id") and not openupgrade.column_exists(
+            env.cr, "account_move_line", "currency_id"
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN mig18_currency_id TO currency_id
+                """,
+            )
+        return
     openupgrade.logged_query(
         env.cr,
         """
@@ -320,6 +366,17 @@ def fill_account_move_line_currency_id(env):
 
 
 def fill_account_move_line_matching_number(env):
+    has_mig18_matching_number = openupgrade.column_exists(
+        env.cr, "account_move_line", "mig18_matching_number"
+    )
+    if has_mig18_matching_number:
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE account_move_line
+            RENAME COLUMN mig18_matching_number TO matching_number
+            """,
+        )
     openupgrade.add_fields(
         env,
         [
@@ -333,6 +390,8 @@ def fill_account_move_line_matching_number(env):
             ),
         ],
     )
+    if has_mig18_matching_number:
+        return
     openupgrade.logged_query(
         env.cr,
         """
@@ -470,6 +529,22 @@ def fill_account_payment_data(env):
 
 
 def create_account_payment_reconciliation(env):
+    if openupgrade.column_exists(env.cr, "account_payment", "mig18_is_reconciled"):
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE account_payment
+            RENAME COLUMN mig18_is_reconciled TO is_reconciled
+            """,
+        )
+    if openupgrade.column_exists(env.cr, "account_payment", "mig18_is_matched"):
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE account_payment
+            RENAME COLUMN mig18_is_matched TO is_matched
+            """,
+        )
     openupgrade.add_fields(
         env,
         [

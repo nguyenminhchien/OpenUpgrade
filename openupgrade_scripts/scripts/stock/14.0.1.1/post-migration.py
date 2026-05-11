@@ -89,7 +89,8 @@ def delete_domain_from_view(env):
 
 @openupgrade.migrate()
 def migrate(env, version):
-    merge_priorities(env)
+    # priority has been updated in foodcoop_mig18_precompute_fields
+    # merge_priorities(env)
     delete_domain_from_view(env)
     openupgrade.load_data(env.cr, "stock", "14.0.1.1/noupdate_changes.xml")
     recompute_stock_picking_scheduled_date(env)
