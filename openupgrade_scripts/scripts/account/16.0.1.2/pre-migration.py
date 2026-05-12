@@ -221,6 +221,30 @@ def _account_move_fast_fill_display_type(env):
     Case 5: with aml is an accounting transaction occurring
             set display type is 'product'
     """
+    has_mig18_display_type = openupgrade.column_exists(
+        env.cr, "account_move_line", "mig18_display_type"
+    )
+    legacy_display_type = openupgrade.get_legacy_name("display_type")
+    if has_mig18_display_type:
+        if openupgrade.column_exists(env.cr, "account_move_line", "display_type") and not openupgrade.column_exists(
+            env.cr, "account_move_line", legacy_display_type
+        ):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN display_type TO {}
+                """.format(legacy_display_type),
+            )
+        if not openupgrade.column_exists(env.cr, "account_move_line", "display_type"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN mig18_display_type TO display_type
+                """,
+            )
+        return
     openupgrade.logged_query(
         env.cr,
         """
@@ -253,12 +277,12 @@ def _account_move_fast_fill_display_type(env):
     # and
     # https://github.com/odoo/odoo/blob/666229a0046e2d0e8331115e0247ad41734fb6e3/
     # addons/account/tests/test_account_move_out_invoice.py#L107
-    openupgrade.logged_query(
-        env.cr,
-        "UPDATE account_move_line SET quantity = 0.00 "
-        "WHERE display_type IN ('tax', 'payment_term') "
-        "AND quantity IS DISTINCT FROM 0",
-    )
+    # openupgrade.logged_query(
+    #     env.cr,
+    #     "UPDATE account_move_line SET quantity = 0.00 "
+    #     "WHERE display_type IN ('tax', 'payment_term') "
+    #     "AND quantity IS DISTINCT FROM 0",
+    # )
 
 
 def _account_move_auto_post_boolean_to_selection(env):

@@ -44,13 +44,27 @@ def _update_stock_quant_storage_category_id(env):
 
 
 def _update_sol_product_category_name(env):
-    openupgrade.logged_query(
-        env.cr,
-        """
-        ALTER TABLE stock_move_line
-        ADD COLUMN IF NOT EXISTS product_category_name CHARACTER VARYING
-        """,
+    has_mig18_product_category_name = openupgrade.column_exists(
+        env.cr, "stock_move_line", "mig18_product_category_name"
     )
+    if has_mig18_product_category_name:
+        if not openupgrade.column_exists(env.cr, "stock_move_line", "product_category_name"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE stock_move_line
+                RENAME COLUMN mig18_product_category_name TO product_category_name
+                """,
+            )
+        return
+    else:
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE stock_move_line
+            ADD COLUMN IF NOT EXISTS product_category_name CHARACTER VARYING
+            """,
+        )
     openupgrade.logged_query(
         env.cr,
         """
@@ -64,7 +78,6 @@ def _update_sol_product_category_name(env):
         WHERE sml.product_id = product.id
         """,
     )
-
 
 def _compute_stock_location_replenish_location(env):
     openupgrade.logged_query(
@@ -129,8 +142,21 @@ def _handle_stock_picking_backorder_strategy(env):
 
 def _prefill_stock_move_quantity_done(env):
     """It's going to be an stored field now. Let's try to speed up the field
-    computation so it performs better in larga stock_move tables"""
-    if not openupgrade.column_exists(env.cr, "stock_move", "quantity_done"):
+    computation so it performs better in large stock_move tables"""
+    has_mig18_quantity_done = openupgrade.column_exists(
+        env.cr, "stock_move", "mig18_quantity_done"
+    )
+    if has_mig18_quantity_done:
+        if not openupgrade.column_exists(env.cr, "stock_move", "quantity_done"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE stock_move
+                RENAME COLUMN mig18_quantity_done TO quantity_done
+                """,
+            )
+        return
+    elif not openupgrade.column_exists(env.cr, "stock_move", "quantity_done"):
         openupgrade.add_fields(
             env,
             [
@@ -156,7 +182,8 @@ def _prefill_stock_move_quantity_done(env):
         ),
         consistent_moves AS (
             SELECT move_id
-            FROM stock_move_line
+            FROM stock_move_line sml
+            JOIN stock_move sm ON sm.id = sml.move_id
             GROUP BY move_id
             HAVING COUNT(DISTINCT product_uom_id) = 1 AND SUM(qty_done) <> 0
         ),
