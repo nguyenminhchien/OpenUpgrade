@@ -75,7 +75,21 @@ def prefill_picked(env):
 
 @openupgrade.migrate()
 def migrate(env, version):
+    column_copies = _column_copies
+    has_mig18_quantity = openupgrade.column_exists(
+        env.cr, "stock_move_line", "mig18_quantity"
+    )
+    if has_mig18_quantity:
+        column_copies = {}
+        if not openupgrade.column_exists(env.cr, "stock_move_line", "quantity"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE stock_move_line
+                RENAME COLUMN mig18_quantity TO quantity
+                """,
+            )
     openupgrade.rename_fields(env, _field_renames)
-    openupgrade.copy_columns(env.cr, _column_copies)
+    openupgrade.copy_columns(env.cr, column_copies)
     fix_move_line_quantity(env)
     prefill_picked(env)
