@@ -158,12 +158,25 @@ def _fast_fill_account_move_amount_total_in_currency_signed(env):
 
 
 def _fast_fill_account_move_line_tax_tag_invert(env):
-    openupgrade.logged_query(
-        env.cr,
-        """
-        ALTER TABLE account_move_line
-        ADD COLUMN IF NOT EXISTS tax_tag_invert BOOL""",
+    has_mig18_tax_tag_invert = openupgrade.column_exists(
+        env.cr, "account_move_line", "mig18_tax_tag_invert"
     )
+    if has_mig18_tax_tag_invert:
+        if not openupgrade.column_exists(env.cr, "account_move_line", "tax_tag_invert"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE account_move_line
+                RENAME COLUMN mig18_tax_tag_invert TO tax_tag_invert""",
+            )
+        return
+    else:
+        openupgrade.logged_query(
+            env.cr,
+            """
+            ALTER TABLE account_move_line
+            ADD COLUMN IF NOT EXISTS tax_tag_invert BOOL""",
+        )
     # 1. Invoices imported from other softwares might only have kept the tags,
     # not the taxes
     openupgrade.logged_query(
@@ -203,7 +216,8 @@ def _fast_fill_account_move_line_tax_tag_invert(env):
             END
         FROM account_move am
         WHERE am.id = aml.move_id AND am.move_type != 'entry'
-            AND aml.tax_tag_invert IS NULL""",
+            AND aml.tax_tag_invert IS NULL
+            """,
     )
     # 3. For misc operations,
     # cash basis entries and write-offs from the bank reconciliation widget
@@ -228,8 +242,7 @@ def _fast_fill_account_move_line_tax_tag_invert(env):
             LEFT JOIN account_tax invoice_tax ON invoice_tax.id = atpl.invoice_tax_id
             WHERE am.move_type = 'entry'
         ) sub
-        WHERE sub.id = aml.id AND aml.tax_tag_invert IS NULL
-        """,
+        WHERE sub.id = aml.id AND aml.tax_tag_invert IS NULL""",
     )
     openupgrade.logged_query(
         env.cr,
