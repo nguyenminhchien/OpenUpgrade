@@ -5,7 +5,21 @@ from openupgradelib import openupgrade
 
 @openupgrade.migrate()
 def migrate(env, version):
-    openupgrade.add_columns(env, [("pos.order.line", "qty_delivered", "float", 0)])
+    has_mig18_qty_delivered = openupgrade.column_exists(
+        env.cr, "pos_order_line", "mig18_qty_delivered"
+    )
+    if has_mig18_qty_delivered:
+        if not openupgrade.column_exists(env.cr, "pos_order_line", "qty_delivered"):
+            openupgrade.logged_query(
+                env.cr,
+                """
+                ALTER TABLE pos_order_line
+                RENAME COLUMN mig18_qty_delivered TO qty_delivered
+                """,
+            )
+        return
+    else:
+        openupgrade.add_columns(env, [("pos.order.line", "qty_delivered", "float", 0)])
     openupgrade.logged_query(
         env.cr,
         """
