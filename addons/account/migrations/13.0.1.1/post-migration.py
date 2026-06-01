@@ -610,15 +610,15 @@ def fill_account_move_type(env):
         WHERE type IS NULL
         """,
     )
-    openupgrade.logged_query(
-        env.cr, """
-        UPDATE account_move_line aml
-        SET account_internal_type = aat.type
-        FROM account_account aa
-        JOIN account_account_type aat ON aa.user_type_id = aat.id
-        WHERE aml.account_id = aa.id AND aml.account_internal_type IS NULL
-        """,
-    )
+    # openupgrade.logged_query(
+    #     env.cr, """
+    #     UPDATE account_move_line aml
+    #     SET account_internal_type = aat.type
+    #     FROM account_account aa
+    #     JOIN account_account_type aat ON aa.user_type_id = aat.id
+    #     WHERE aml.account_id = aa.id AND aml.account_internal_type IS NULL
+    #     """,
+    # )
 
 
 def fill_res_partner_ranks(env):
