@@ -232,9 +232,16 @@ def generate_stock_valuation_layer(env):
                 # Add in svl
                 if move["move_type"] == "in" or is_dropship:
                     total_qty = previous_qty + move["product_qty"]
-                    # TODO: is needed vaccum if total_qty is negative?
-                    if float_is_zero(total_qty, precision_digits=precision_uom):
-                        previous_price = move["price_unit"]
+                    # Match v12 behavior: when previous stock is 0 or negative, skip AVCO
+                    # formula and use the IN move price directly. This avoids division by a
+                    # very small total_qty (near-zero denominator) which causes AVCO explosion.
+                    # Also handles inventory adjustments (price_unit=NULL→0 via COALESCE): keep
+                    # previous_price unchanged when price_unit is zero.
+                    if (float_is_zero(total_qty, precision_digits=precision_uom)
+                            or float_is_zero(previous_qty, precision_digits=precision_uom)
+                            or previous_qty < 0):
+                        if not float_is_zero(move["price_unit"], precision_digits=precision_price):
+                            previous_price = move["price_unit"]
                     else:
                         previous_price = float_round(
                             (previous_price * previous_qty + move["price_unit"] * move["product_qty"]) / total_qty,
