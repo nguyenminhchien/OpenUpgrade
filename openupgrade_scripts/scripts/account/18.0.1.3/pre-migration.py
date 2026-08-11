@@ -157,27 +157,48 @@ def adapt_account_move_sending_data(env):
 
 
 def fill_account_payment(env):
-    openupgrade.logged_query(
-        env.cr,
-        """
-        UPDATE account_payment ap
-        SET memo = am.ref,
-            state= CASE WHEN am.state = 'cancel' THEN 'canceled'
-                        WHEN am.payment_state = 'paid' THEN 'paid'
-                        WHEN am.state = 'posted' THEN 'in_process'
-                        ELSE am.state END,
-            is_sent = am.is_move_sent,
-            name = CASE WHEN am.name != '/' THEN am.name
-                        ELSE 'Draft Payment' END,
-            date = am.date,
-            journal_id = CASE WHEN ap.journal_id IS NULL
-                                AND aj.type in ('bank', 'cash', 'credit')
-                              THEN am.journal_id ELSE ap.journal_id END
-        FROM account_move am
-        LEFT JOIN account_journal aj ON am.journal_id = aj.id
-        WHERE ap.move_id = am.id""",
-    )
-
+    if openupgrade.column_exists(env.cr, "account_payment", "communication"):
+        openupgrade.logged_query(
+            env.cr,
+            """
+            UPDATE account_payment ap
+            SET memo = COALESCE(ap.communication, am.ref),
+                state= CASE WHEN am.state = 'cancel' THEN 'canceled'
+                            WHEN am.payment_state = 'paid' THEN 'paid'
+                            WHEN am.state = 'posted' THEN 'in_process'
+                            ELSE am.state END,
+                is_sent = am.is_move_sent,
+                name = CASE WHEN am.name != '/' THEN am.name
+                            ELSE 'Draft Payment' END,
+                date = am.date,
+                journal_id = CASE WHEN ap.journal_id IS NULL
+                                    AND aj.type in ('bank', 'cash', 'credit')
+                                THEN am.journal_id ELSE ap.journal_id END
+            FROM account_move am
+            LEFT JOIN account_journal aj ON am.journal_id = aj.id
+            WHERE ap.move_id = am.id""",
+        )
+    else:
+        openupgrade.logged_query(
+            env.cr,
+            """
+            UPDATE account_payment ap
+            SET memo = am.ref,
+                state= CASE WHEN am.state = 'cancel' THEN 'canceled'
+                            WHEN am.payment_state = 'paid' THEN 'paid'
+                            WHEN am.state = 'posted' THEN 'in_process'
+                            ELSE am.state END,
+                is_sent = am.is_move_sent,
+                name = CASE WHEN am.name != '/' THEN am.name
+                            ELSE 'Draft Payment' END,
+                date = am.date,
+                journal_id = CASE WHEN ap.journal_id IS NULL
+                                    AND aj.type in ('bank', 'cash', 'credit')
+                                THEN am.journal_id ELSE ap.journal_id END
+            FROM account_move am
+            LEFT JOIN account_journal aj ON am.journal_id = aj.id
+            WHERE ap.move_id = am.id""",
+        )
 
 def fill_statement_line_fields(env):
     openupgrade.logged_query(
