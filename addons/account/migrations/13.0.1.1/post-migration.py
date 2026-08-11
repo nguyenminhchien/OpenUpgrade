@@ -429,7 +429,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                     ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                     ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                    THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                    THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                     ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                     ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                     ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -453,7 +453,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -479,7 +479,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                     ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                     ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                    THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                    THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                     ail.product_id, ail.account_analytic_id, ail.display_type,
                     ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                     ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -503,7 +503,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type,
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -531,7 +531,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -556,7 +556,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -583,7 +583,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type,
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -608,7 +608,7 @@ def migration_invoice_moves(env):
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
                 ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id
-                THEN ail.currency_id ELSE NULL END, ail.partner_id, ail.uom_id,
+                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type,
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
