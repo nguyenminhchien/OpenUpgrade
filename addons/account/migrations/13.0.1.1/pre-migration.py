@@ -185,6 +185,25 @@ def fill_account_move_line(env):
         ADD COLUMN account_internal_type varchar""",
     )
 
+    if openupgrade.column_exists(env.cr, "account_invoice_line", "package_qty"):
+        openupgrade.logged_query(
+            env.cr, """
+            ALTER TABLE account_move_line
+            ADD COLUMN package_qty numeric""",
+        )
+
+        openupgrade.logged_query(
+            env.cr, """
+            ALTER TABLE account_move_line
+            ADD COLUMN product_qty_package numeric""",
+        )
+
+        openupgrade.logged_query(
+            env.cr, """
+            ALTER TABLE account_move_line
+            ADD COLUMN price_policy varchar""",
+        )
+
     if skip_parent_state:
         return
     openupgrade.logged_query(
