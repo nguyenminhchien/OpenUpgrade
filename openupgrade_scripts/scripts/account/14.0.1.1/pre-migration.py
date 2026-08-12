@@ -353,6 +353,17 @@ def fill_account_move_line_currency_id(env):
                 RENAME COLUMN mig18_currency_id TO currency_id
                 """,
             )
+            # In the case of new records creating within the period of migration to 14.0
+            openupgrade.logged_query(
+                env.cr,
+                """
+                UPDATE account_move_line
+                SET currency_id = company_currency_id,
+                    amount_residual_currency = amount_residual
+                WHERE currency_id IS NULL
+                    AND create_date > (CURRENT_TIMESTAMP - INTERVAL '24 hours')
+                """,
+            )
         return
     openupgrade.logged_query(
         env.cr,

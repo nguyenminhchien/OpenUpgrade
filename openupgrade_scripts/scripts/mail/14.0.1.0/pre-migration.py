@@ -11,19 +11,22 @@ def fill_mail_tracking_value_field(env):
     As the column is required, we do it on pre, and we need also to remove those
     records whose field reference doesn't exist anymore.
     """
-    openupgrade.logged_query(env.cr, "ALTER TABLE mail_tracking_value ADD field int4")
-    openupgrade.logged_query(
-        env.cr,
-        """
-        UPDATE mail_tracking_value mtv
-        SET field = imf.id
-        FROM ir_model_fields imf
-        JOIN mail_message mm ON imf.model = mm.model
-        WHERE imf.name = mtv.{} AND mtv.mail_message_id = mm.id
-        """.format(
-            openupgrade.get_legacy_name("field")
-        ),
-    )
+    if openupgrade.column_exists(env.cr, "mail_tracking_value", "mig18_field"):
+        openupgrade.rename_columns(env.cr, {"mail_tracking_value": [("mig18_field", "field")]})
+    else:
+        openupgrade.logged_query(env.cr, "ALTER TABLE mail_tracking_value ADD field int4")
+        openupgrade.logged_query(
+            env.cr,
+            """
+            UPDATE mail_tracking_value mtv
+            SET field = imf.id
+            FROM ir_model_fields imf
+            JOIN mail_message mm ON imf.model = mm.model
+            WHERE imf.name = mtv.{} AND mtv.mail_message_id = mm.id
+            """.format(
+                openupgrade.get_legacy_name("field")
+            ),
+        )
     openupgrade.logged_query(
         env.cr, "DELETE FROM mail_tracking_value WHERE field IS NULL"
     )
