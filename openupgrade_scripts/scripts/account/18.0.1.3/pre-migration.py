@@ -164,7 +164,7 @@ def fill_account_payment(env):
             UPDATE account_payment ap
             SET memo = COALESCE(ap.communication, am.ref),
                 state= CASE WHEN am.state = 'cancel' THEN 'canceled'
-                            WHEN am.payment_state = 'paid' THEN 'paid'
+                            WHEN am.payment_state = 'paid' or ap.is_reconciled IS TRUE THEN 'paid'
                             WHEN am.state = 'posted' THEN 'in_process'
                             ELSE am.state END,
                 is_sent = am.is_move_sent,
@@ -185,7 +185,7 @@ def fill_account_payment(env):
             UPDATE account_payment ap
             SET memo = am.ref,
                 state= CASE WHEN am.state = 'cancel' THEN 'canceled'
-                            WHEN am.payment_state = 'paid' THEN 'paid'
+                            WHEN am.payment_state = 'paid' or ap.is_reconciled IS TRUE THEN 'paid'
                             WHEN am.state = 'posted' THEN 'in_process'
                             ELSE am.state END,
                 is_sent = am.is_move_sent,
