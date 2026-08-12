@@ -420,7 +420,8 @@ def migration_invoice_moves(env):
                 env.cr, """
                 INSERT INTO account_move_line (company_id, journal_id, account_id,
                     exclude_from_invoice_tab, sequence, name, quantity, price_unit, discount,
-                    price_subtotal, price_total, company_currency_id, currency_id, partner_id, product_uom_id,
+                    price_subtotal, price_total, company_currency_id, currency_id, mig18_currency_id,
+                    partner_id, product_uom_id,
                     product_id, analytic_account_id, display_type, mig18_display_type, is_rounding_line,
                     move_id, old_invoice_line_id, date, create_uid, create_date, write_uid,
                     write_date, parent_state, move_name, credit, debit, balance,
@@ -428,8 +429,9 @@ def migration_invoice_moves(env):
                 )
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                     ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
-                    ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
-                    THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
+                    ail.price_total, rc.currency_id,
+                    CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
+                    THEN ail.currency_id ELSE rc.currency_id END, rc.currency_id, ail.partner_id, ail.uom_id,
                     ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                     ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                     ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -446,14 +448,16 @@ def migration_invoice_moves(env):
                 env.cr, """
                 INSERT INTO account_move_line (company_id, journal_id, account_id,
                 exclude_from_invoice_tab, sequence, name, quantity, price_unit, discount,
-                price_subtotal, price_total, company_currency_id, currency_id, partner_id, product_uom_id,
+                price_subtotal, price_total, company_currency_id, currency_id, mig18_currency_id,
+                partner_id, product_uom_id,
                 product_id, analytic_account_id, display_type, mig18_display_type, is_rounding_line,
                 move_id, old_invoice_line_id, date, create_uid, create_date, write_uid,
                 write_date, parent_state, move_name, credit, debit, balance)
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
-                ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
-                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
+                ail.price_total, rc.currency_id,
+                CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
+                THEN ail.currency_id ELSE rc.currency_id END, rc.currency_id, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -522,7 +526,8 @@ def migration_invoice_moves(env):
                 env.cr, """
                 INSERT INTO account_move_line (company_id, journal_id, account_id,
                     exclude_from_invoice_tab, sequence, name, quantity, price_unit, discount,
-                    price_subtotal, price_total, company_currency_id, currency_id, partner_id, product_uom_id,
+                    price_subtotal, price_total, company_currency_id, currency_id, mig18_currency_id,
+                    partner_id, product_uom_id,
                     product_id, analytic_account_id, display_type, mig18_display_type, is_rounding_line,
                     move_id, old_invoice_line_id, date, create_uid, create_date, write_uid,
                     write_date, parent_state, move_name, credit, debit, balance,
@@ -530,8 +535,9 @@ def migration_invoice_moves(env):
                 )
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
-                ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
-                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
+                ail.price_total, rc.currency_id, 
+                CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
+                THEN ail.currency_id ELSE rc.currency_id END, rc.currency_id, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -549,14 +555,16 @@ def migration_invoice_moves(env):
                 env.cr, """
                 INSERT INTO account_move_line (company_id, journal_id, account_id,
                 exclude_from_invoice_tab, sequence, name, quantity, price_unit, discount,
-                price_subtotal, price_total, company_currency_id, currency_id, partner_id, product_uom_id,
+                price_subtotal, price_total, company_currency_id, currency_id, mig18_currency_id,
+                partner_id, product_uom_id,
                 product_id, analytic_account_id, display_type, mig18_display_type, is_rounding_line,
                 move_id, old_invoice_line_id, date, create_uid, create_date, write_uid,
                 write_date, parent_state, move_name, credit, debit, balance)
                 SELECT ail.company_id, am.journal_id, ail.account_id, FALSE, ail.sequence, ail.name,
                 ail.quantity, ail.price_unit, ail.discount, ail.price_subtotal,
-                ail.price_total, rc.currency_id, CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
-                THEN ail.currency_id ELSE rc.currency_id END, ail.partner_id, ail.uom_id,
+                ail.price_total, rc.currency_id, 
+                CASE WHEN rc.currency_id != ail.currency_id AND ail.currency_id IS NOT NULL
+                THEN ail.currency_id ELSE rc.currency_id END, rc.currency_id, ail.partner_id, ail.uom_id,
                 ail.product_id, ail.account_analytic_id, ail.display_type, 'product',
                 ail.is_rounding_line, COALESCE(ai.move_id, am.id), ail.id, COALESCE(ai.date, ai.date_invoice),
                 ail.create_uid, ail.create_date, ail.write_uid, ail.write_date, am.state, am.name,
@@ -638,23 +646,42 @@ def migration_invoice_moves(env):
             OR ait.account_analytic_id = aml.analytic_account_id)""",
     )
     # Draft or Cancel Invoice Taxes
-    openupgrade.logged_query(
-        env.cr, """
-        INSERT INTO account_move_line (company_id, journal_id, account_id,
-        sequence, name, price_unit, currency_id, tax_base_amount,
-        tax_line_id, analytic_account_id, move_id, old_invoice_tax_id,
-        exclude_from_invoice_tab, parent_state, quantity, partner_id, date,
-        create_uid, create_date, write_uid, write_date, move_name, credit, debit, balance)
-        SELECT ait.company_id, am.journal_id, ait.account_id, ait.sequence, ait.name,
-        ait.amount, ait.currency_id, ait.base, ait.tax_id,
-        ait.account_analytic_id, COALESCE(ai.move_id, am.id),
-        ait.id, TRUE, COALESCE(am.state, ai.state), 1.0, ai.commercial_partner_id, COALESCE(ai.date, ai.date_invoice),
-        ait.create_uid, ait.create_date, ait.write_uid, ait.write_date, am.name, 0.0, 0.0, 0.0
-        FROM account_invoice_tax ait
-        JOIN account_invoice ai ON ait.invoice_id = ai.id AND ai.state IN ('draft', 'cancel')
-        LEFT JOIN account_move am ON am.old_invoice_id = ai.id
-        WHERE COALESCE(ai.move_id, am.id) IS NOT NULL""",
-    )
+    if openupgrade.column_exists(env.cr, "account_move_line", "mig18_currency_id"):
+        openupgrade.logged_query(
+            env.cr, """
+            INSERT INTO account_move_line (company_id, journal_id, account_id,
+            sequence, name, price_unit, currency_id, mig18_currency_id, tax_base_amount,
+            tax_line_id, analytic_account_id, move_id, old_invoice_tax_id,
+            exclude_from_invoice_tab, parent_state, quantity, partner_id, date,
+            create_uid, create_date, write_uid, write_date, move_name, credit, debit, balance)
+            SELECT ait.company_id, am.journal_id, ait.account_id, ait.sequence, ait.name,
+            ait.amount, ait.currency_id, ait.currency_id, ait.base, ait.tax_id,
+            ait.account_analytic_id, COALESCE(ai.move_id, am.id),
+            ait.id, TRUE, COALESCE(am.state, ai.state), 1.0, ai.commercial_partner_id, COALESCE(ai.date, ai.date_invoice),
+            ait.create_uid, ait.create_date, ait.write_uid, ait.write_date, am.name, 0.0, 0.0, 0.0
+            FROM account_invoice_tax ait
+            JOIN account_invoice ai ON ait.invoice_id = ai.id AND ai.state IN ('draft', 'cancel')
+            LEFT JOIN account_move am ON am.old_invoice_id = ai.id
+            WHERE COALESCE(ai.move_id, am.id) IS NOT NULL""",
+        )
+    else:
+        openupgrade.logged_query(
+            env.cr, """
+            INSERT INTO account_move_line (company_id, journal_id, account_id,
+            sequence, name, price_unit, currency_id, tax_base_amount,
+            tax_line_id, analytic_account_id, move_id, old_invoice_tax_id,
+            exclude_from_invoice_tab, parent_state, quantity, partner_id, date,
+            create_uid, create_date, write_uid, write_date, move_name, credit, debit, balance)
+            SELECT ait.company_id, am.journal_id, ait.account_id, ait.sequence, ait.name,
+            ait.amount, ait.currency_id, ait.base, ait.tax_id,
+            ait.account_analytic_id, COALESCE(ai.move_id, am.id),
+            ait.id, TRUE, COALESCE(am.state, ai.state), 1.0, ai.commercial_partner_id, COALESCE(ai.date, ai.date_invoice),
+            ait.create_uid, ait.create_date, ait.write_uid, ait.write_date, am.name, 0.0, 0.0, 0.0
+            FROM account_invoice_tax ait
+            JOIN account_invoice ai ON ait.invoice_id = ai.id AND ai.state IN ('draft', 'cancel')
+            LEFT JOIN account_move am ON am.old_invoice_id = ai.id
+            WHERE COALESCE(ai.move_id, am.id) IS NOT NULL""",
+        )
     openupgrade.merge_models(env.cr, 'account.invoice.tax', 'account.move.line', 'old_invoice_tax_id')
     openupgrade.logged_query(
         env.cr, """
@@ -812,23 +839,42 @@ def migration_voucher_moves(env):
                 AND aml.old_voucher_line_id IS NULL""",
         )
     # Draft, cancel & proforma voucher lines
-    openupgrade.logged_query(
-        env.cr, """
-        INSERT INTO account_move_line (company_id, journal_id, account_id,
-        exclude_from_invoice_tab, sequence, name, quantity, price_unit, price_subtotal,
-        product_id, analytic_account_id, move_id, old_voucher_line_id,
-        date, create_uid, create_date, write_uid, write_date, parent_state, move_name,
-        credit, debit, balance)
-        SELECT avl.company_id, am.journal_id, avl.account_id, FALSE, avl.sequence, avl.name,
-        avl.quantity, avl.price_unit, avl.price_subtotal, avl.product_id,
-        avl.account_analytic_id, COALESCE(av.move_id, am.id), avl.id, COALESCE(am.date, avl.create_date),
-        avl.create_uid, avl.create_date, avl.write_uid, avl.write_date, am.state, am.name,
-        0.0, 0.0, 0.0
-        FROM account_voucher_line avl
-        JOIN account_voucher av ON avl.voucher_id = av.id AND av.state in ('draft', 'cancel', 'proforma')
-        LEFT JOIN account_move am ON am.old_voucher_id = av.id
-        WHERE COALESCE(av.move_id, am.id) IS NOT NULL""",
-    )
+    if openupgrade.column_exists(env.cr, "account_move_line", "mig18_currency_id"):
+        openupgrade.logged_query(
+            env.cr, """
+            INSERT INTO account_move_line (company_id, journal_id, account_id,
+            exclude_from_invoice_tab, sequence, name, quantity, price_unit, price_subtotal,
+            product_id, analytic_account_id, move_id, old_voucher_line_id,
+            date, create_uid, create_date, write_uid, write_date, parent_state, move_name,
+            credit, debit, balance, mig18_currency_id)
+            SELECT avl.company_id, am.journal_id, avl.account_id, FALSE, avl.sequence, avl.name,
+            avl.quantity, avl.price_unit, avl.price_subtotal, avl.product_id,
+            avl.account_analytic_id, COALESCE(av.move_id, am.id), avl.id, COALESCE(am.date, avl.create_date),
+            avl.create_uid, avl.create_date, avl.write_uid, avl.write_date, am.state, am.name,
+            0.0, 0.0, 0.0,av.currency_id
+            FROM account_voucher_line avl
+            JOIN account_voucher av ON avl.voucher_id = av.id AND av.state in ('draft', 'cancel', 'proforma')
+            LEFT JOIN account_move am ON am.old_voucher_id = av.id
+            WHERE COALESCE(av.move_id, am.id) IS NOT NULL""",
+        )
+    else:
+        openupgrade.logged_query(
+            env.cr, """
+            INSERT INTO account_move_line (company_id, journal_id, account_id,
+            exclude_from_invoice_tab, sequence, name, quantity, price_unit, price_subtotal,
+            product_id, analytic_account_id, move_id, old_voucher_line_id,
+            date, create_uid, create_date, write_uid, write_date, parent_state, move_name,
+            credit, debit, balance)
+            SELECT avl.company_id, am.journal_id, avl.account_id, FALSE, avl.sequence, avl.name,
+            avl.quantity, avl.price_unit, avl.price_subtotal, avl.product_id,
+            avl.account_analytic_id, COALESCE(av.move_id, am.id), avl.id, COALESCE(am.date, avl.create_date),
+            avl.create_uid, avl.create_date, avl.write_uid, avl.write_date, am.state, am.name,
+            0.0, 0.0, 0.0
+            FROM account_voucher_line avl
+            JOIN account_voucher av ON avl.voucher_id = av.id AND av.state in ('draft', 'cancel', 'proforma')
+            LEFT JOIN account_move am ON am.old_voucher_id = av.id
+            WHERE COALESCE(av.move_id, am.id) IS NOT NULL""",
+        )
     openupgrade.merge_models(env.cr, 'account.voucher.line', 'account.move.line', 'old_voucher_line_id')
     openupgrade.logged_query(
         env.cr, """
