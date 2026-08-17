@@ -203,6 +203,12 @@ def fill_account_move_line(env):
             ALTER TABLE account_move_line
             ADD COLUMN price_policy varchar""",
         )
+    if openupgrade.column_exists(env.cr, "account_invoice_line", "base_price"):
+        openupgrade.logged_query(
+            env.cr, """
+            ALTER TABLE account_move_line
+            ADD COLUMN base_price numeric""",
+        )
 
     if skip_parent_state:
         return
