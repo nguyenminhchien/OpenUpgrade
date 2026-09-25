@@ -13,6 +13,16 @@ def fill_mail_tracking_value_field(env):
     """
     if openupgrade.column_exists(env.cr, "mail_tracking_value", "mig18_field"):
         openupgrade.rename_columns(env.cr, {"mail_tracking_value": [("mig18_field", "field")]})
+        openupgrade.logged_query(
+            env.cr,
+            """
+            DELETE FROM mail_tracking_value mtv
+            WHERE mtv.field IS NULL
+                OR NOT EXISTS (
+                    SELECT 1 FROM ir_model_fields imf WHERE imf.id = mtv.field
+                )
+            """,
+        )
     else:
         openupgrade.logged_query(env.cr, "ALTER TABLE mail_tracking_value ADD field int4")
         openupgrade.logged_query(
@@ -27,10 +37,9 @@ def fill_mail_tracking_value_field(env):
                 openupgrade.get_legacy_name("field")
             ),
         )
-    openupgrade.logged_query(
-        env.cr, "DELETE FROM mail_tracking_value WHERE field IS NULL"
-    )
-
+        openupgrade.logged_query(
+            env.cr, "DELETE FROM mail_tracking_value WHERE field IS NULL"
+        )
 
 @openupgrade.migrate()
 def migrate(env, version):
