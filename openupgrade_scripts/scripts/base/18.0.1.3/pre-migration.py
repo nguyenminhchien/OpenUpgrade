@@ -64,13 +64,14 @@ def _fix_company_layout_background(cr):
 # trobz migrate
 def _fix_barcode_json_value_compatibility(cr):
     """ """
-    openupgrade.logged_query(
-        cr,
-        r"""UPDATE res_partner
-            SET barcode = '"' || barcode || '"'
-            WHERE barcode IS NOT NULL
-            AND (barcode !~ '^\s*[{[].*[]}]$');""",
-    )
+    if openupgrade.column_exists(cr, "res_partner", "barcode"):
+        openupgrade.logged_query(
+            cr,
+            r"""UPDATE res_partner
+                SET barcode = '"' || barcode || '"'
+                WHERE barcode IS NOT NULL
+                AND (barcode !~ '^\s*[{[].*[]}]$');""",
+        )
 
 
 @openupgrade.migrate(use_env=False)
