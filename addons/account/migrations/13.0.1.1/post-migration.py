@@ -653,15 +653,18 @@ def migration_invoice_moves(env):
         openupgrade.logged_query(
             env.cr, """
             INSERT INTO account_move_line (company_id, journal_id, account_id,
-            sequence, name, price_unit, currency_id, mig18_currency_id, tax_base_amount,
-            tax_line_id, analytic_account_id, move_id, old_invoice_tax_id,
-            exclude_from_invoice_tab, parent_state, quantity, partner_id, date,
-            create_uid, create_date, write_uid, write_date, move_name, credit, debit, balance)
+                sequence, name, price_unit, currency_id, mig18_currency_id, tax_base_amount,
+                tax_line_id, analytic_account_id, move_id, old_invoice_tax_id,
+                exclude_from_invoice_tab, parent_state, quantity, partner_id, date,
+                create_uid, create_date, write_uid, write_date, move_name, credit, debit, balance,
+                mig18_display_type
+            )
             SELECT ait.company_id, am.journal_id, ait.account_id, ait.sequence, ait.name,
-            ait.amount, ait.currency_id, ait.currency_id, ait.base, ait.tax_id,
-            ait.account_analytic_id, COALESCE(ai.move_id, am.id),
-            ait.id, TRUE, COALESCE(am.state, ai.state), 1.0, ai.commercial_partner_id, COALESCE(ai.date, ai.date_invoice),
-            ait.create_uid, ait.create_date, ait.write_uid, ait.write_date, am.name, 0.0, 0.0, 0.0
+                ait.amount, ait.currency_id, ait.currency_id, ait.base, ait.tax_id,
+                ait.account_analytic_id, COALESCE(ai.move_id, am.id),
+                ait.id, TRUE, COALESCE(am.state, ai.state), 1.0, ai.commercial_partner_id, COALESCE(ai.date, ai.date_invoice),
+                ait.create_uid, ait.create_date, ait.write_uid, ait.write_date, am.name, 0.0, 0.0, 0.0,
+                'tax'
             FROM account_invoice_tax ait
             JOIN account_invoice ai ON ait.invoice_id = ai.id AND ai.state IN ('draft', 'cancel')
             LEFT JOIN account_move am ON am.old_invoice_id = ai.id
