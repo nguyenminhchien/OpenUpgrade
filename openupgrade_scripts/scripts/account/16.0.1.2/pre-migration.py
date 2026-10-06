@@ -244,7 +244,6 @@ def _account_move_fast_fill_display_type(env):
                 RENAME COLUMN mig18_display_type TO display_type
                 """,
             )
-        return
     openupgrade.logged_query(
         env.cr,
         """
