@@ -780,6 +780,13 @@ def fill_account_move_line_amounts(env):
                 RENAME COLUMN mig18_amount_currency TO amount_currency
                 """,
             )
+            openupgrade.logged_query(
+                env.cr,
+                """
+                UPDATE account_move_line aml
+                SET amount_currency = aml.debit-aml.credit
+                WHERE aml.amount_currency IS NULL""",
+            )
         return
     openupgrade.logged_query(
         env.cr,
